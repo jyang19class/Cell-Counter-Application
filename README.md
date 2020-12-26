@@ -9,3 +9,5 @@ Main program is run from app_window.
 -Click on count, this will change the cursor and you should click on a cell to get the color  
 -The results will have the cells circled in red, the count number will be beside the count button  
 -Undo will return the original uploaded image
+
+exe: https://github.com/jyang19class/Cell-Counter-Application/releases/tag/exe
