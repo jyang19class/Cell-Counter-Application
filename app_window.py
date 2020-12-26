@@ -11,6 +11,7 @@ class WindowDetails():
         self.img = None
         self.imagePath = None
         self.imagePanel = None
+        self.count = None
         self.loaded = False
         self.mouseActivated = False
         self.saturation = 0
@@ -37,6 +38,7 @@ def open_img(details):
 
     details.imagePanel.config(width=_width, height=_height)
     details.imagePanel.create_image(0,0, image=details.img, anchor='nw')
+    details.count.configure(text='  0')
 
     _height = _height + 10
     _width = _width + 125
@@ -52,10 +54,12 @@ def countCell(event, details):
     y = event.y
     deactivateMouse(details)
 
-    #reformat cv2 img 
-    formatted = Image.fromarray(count.countCells(x,y, details.imagePath, details.saturation, details.hue))
+    #reformat cv2 img
+    newImage, countNumber = count.countCells(x,y, details.imagePath, details.saturation, details.hue)
+    formatted = Image.fromarray(newImage)
     details.img = ImageTk.PhotoImage(formatted)
     details.imagePanel.create_image(0,0, image=details.img, anchor='nw')
+    details.count.configure(text='  '+ str(countNumber))
 
 
 def activateMouse(details):
@@ -82,6 +86,7 @@ def setHue(value, details):
 def undo(details):
     details.img = details.originalImg
     details.imagePanel.create_image(0,0, image=details.img, anchor='nw')
+    details.count.configure(text='  0')
 
 if __name__ == "__main__":
     windowInfo = WindowDetails()
@@ -89,10 +94,10 @@ if __name__ == "__main__":
     windowInfo.imagePanel = Canvas(root, width = 400, height = 400)
     windowInfo.imagePanel.grid(row=1, rowspan=5)
     # Set Title
-    root.title("Cell Counter") 
-  
+    root.title("Cell Counter")
+
     # Set the resolution of window
-    root.geometry("600x400") 
+    root.geometry("600x400")
 
     # Allow Window to be resizable
     root.resizable(width = True, height = True) 
@@ -100,10 +105,17 @@ if __name__ == "__main__":
     # Create buttons
     openButton = Button(root, text ='Open Image', command = lambda: open_img(windowInfo), width=10)
     openButton.grid(row = 1, column = 2) 
-    colorButton = Button(root, text='Count',command = lambda: selectColor(windowInfo), width=10)
-    colorButton.grid(row = 2, column = 2)
-    colorButton = Button(root, text='Undo',command = lambda: undo(windowInfo), height=1, width=5)
-    colorButton.grid(row = 3, column = 2)
+
+    countFrame = Frame(root)
+    countFrame.grid(row = 2, column = 2)
+    colorButton = Button(countFrame, text='Count',command = lambda: selectColor(windowInfo), width=6)
+    colorButton.pack(side=LEFT)
+    countLabel = Label(countFrame, text='   0')
+    countLabel.pack(side=RIGHT)
+    windowInfo.count = countLabel
+
+    undoButton = Button(root, text='Undo',command = lambda: undo(windowInfo), height=1, width=5)
+    undoButton.grid(row = 3, column = 2)
 
     #Create Sliders
     saturationSlider = Scale(root, from_=40, to=80, orient=HORIZONTAL, tickinterval = 10, label='Saturation',
